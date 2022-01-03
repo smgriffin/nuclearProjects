@@ -4,3 +4,6 @@ Visualizing the number of nuclear reactors (including theoretical) in different 
 1. Run Scraper
 2. Locate .csv
 3. Play
+
+
+Thank you to the World Nuclear Association.
