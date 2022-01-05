@@ -2,6 +2,7 @@
 library(dplyr)
 library(stringr)
 library(countrycode)
+library(ggplot2)
 
 # Read csv into dataframe
 df = read.csv("/Users/SG/Documents/Programming/nuclearProjects/nuclearData.csv")
@@ -10,14 +11,14 @@ df = read.csv("/Users/SG/Documents/Programming/nuclearProjects/nuclearData.csv")
 dfReactor <- df[, -c(2, 3, 5, 7, 9, 11, 12)]
 
 # remove unwanted rows
-dfReactor <- dfReactor[-c(1, 45, 46),]
+dfReactor <- dfReactor[-c(1, 44, 45, 46),]
 
 # rename columns
 dfReactor = rename(dfReactor, "Country" = 1,
-                              "Operable Reactors" = 2,
-                              "Under Construction Reactors" = 3,
-                              "Planned Reactors" = 4,
-                              "Proposed Reactors" = 5)
+                              "Operable" = 2,
+                              "UnderConstruction" = 3,
+                              "Planned" = 4,
+                              "Proposed" = 5)
 
 # extract strings from country column to remove symbols
 dfReactor <- dfReactor %>% mutate(Country = str_extract(Country, "[A-Za-z ]+"))
@@ -26,3 +27,30 @@ dfReactor <- dfReactor %>% mutate(Country = str_extract(Country, "[A-Za-z ]+"))
 region <- countrycode(dfReactor$Country, origin = 'country.name', destination = 'region')
 dfReactor$Region <- region
 dfReactor <- dfReactor %>% relocate(Region, .after = Country)
+
+# group the data by region and summarise
+byRegion <- dfReactor %>% group_by(Region)
+byRegion <- byRegion %>% mutate_at(c(3:6), as.numeric)
+byRegion <- byRegion %>% summarise(
+    Operable = sum(Operable),
+    "Under Construction" = sum(UnderConstruction),
+    Planned = sum(Planned),
+    Proposed = sum(Proposed)
+)
+
+# Add a total column and reorder
+#byRegion$Total <- rowSums(byRegion[,c("Operable", "Under Construction", "Planned", "Proposed")])
+#byRegion <- arrange(byRegion, -Total)
+
+# lengthen data to prepare for grouped barchart
+longRegion <- pivot_longer(byRegion, !Region, names_to = "Status", values_to = "Count")
+
+# create grouped barchart
+ggplot(longRegion, aes(fill = Status, y= Count, x = Region)) +
+    geom_bar(position="dodge", stat="identity") +
+    theme(axis.text.x=element_text(angle=45, hjust=1)) +
+    scale_fill_brewer(palette = "Spectral") +
+    labs(title = "Global Nuclear Projects",
+         subtitle = "Plotted by Region",
+         caption = "Data source: World Nuclear Association"
+)
