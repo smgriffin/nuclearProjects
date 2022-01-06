@@ -29,6 +29,9 @@ dfReactor$Region <- region
 dfReactor <- dfReactor %>% relocate(Region, .after = Country)
 
 # Write clean data to csv
+colnms <- c("Operable", "UnderConstruction", "Planned", "Proposed")
+dfReactor[, colnms] <- lapply(dfReactor[, colnms], as.numeric)
+dfReactor$Total <- rowSums(dfReactor[, colnms])
 write.csv(dfReactor, "/Users/SG/Documents/Programming/nuclearProjects/cleanReactor.csv", row.names = FALSE)
 
 # group the data by region and summarise
