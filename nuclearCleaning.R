@@ -28,6 +28,9 @@ region <- countrycode(dfReactor$Country, origin = 'country.name', destination = 
 dfReactor$Region <- region
 dfReactor <- dfReactor %>% relocate(Region, .after = Country)
 
+# Write clean data to csv
+write.csv(dfReactor, "/Users/SG/Documents/Programming/nuclearProjects/cleanReactor.csv", row.names = FALSE)
+
 # group the data by region and summarise
 byRegion <- dfReactor %>% group_by(Region)
 byRegion <- byRegion %>% mutate_at(c(3:6), as.numeric)
