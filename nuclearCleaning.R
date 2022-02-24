@@ -5,7 +5,7 @@ library(countrycode)
 library(ggplot2)
 
 # Read csv into dataframe
-df = read.csv("/Users/SG/Documents/Programming/nuclearProjects/nuclearData.csv")
+df = read.csv("")
 
 # remove unwanted columns
 dfReactor <- df[, -c(2, 3, 5, 7, 9, 11, 12)]
